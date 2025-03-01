@@ -2,8 +2,8 @@ name: Launch Streamlit Chatbot
 
 on:  
   push:  
-    branches: [main]  # Run when code is pushed to the 'main' branch
-  workflow_dispatch:  # Allow manual execution from GitHub Actions
+    branches: [main]  # Runs when pushing to 'main'
+  workflow_dispatch:  # Allows manual trigger from GitHub Actions
 
 jobs:
   launch-chatbot:
@@ -11,18 +11,22 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3  # Pull latest code from repo
+        uses: actions/checkout@v4  # Pull latest code from repo
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.10"  # Specify Python version
+          python-version: "3.10"  # Use Python 3.10
 
       - name: Install Dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt  # Ensure dependencies are installed
+          pip install -r requirements.txt  # Install all dependencies, including Streamlit
 
       - name: Run Streamlit Application
         run: |
-          nohup streamlit run /Users/datasense/Desktop/chatbot/main.py &  # Run in background
+          nohup streamlit run main.py --server.port 8501 --server.headless true &  # Run in background
+        working-directory: ${{ github.workspace }}  # Ensure it's running in the correct directory
+
+      - name: Keep Runner Alive
+        run: sleep 3600  # Keeps the runner alive for an hour
